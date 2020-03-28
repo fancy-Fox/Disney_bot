@@ -7,7 +7,7 @@ from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_api.longpoll import VkLongPoll, VkEventType
 
 
-import comands
+import commands
 import game1
 import secret_constants
 
@@ -29,9 +29,9 @@ def is_correct_event(event):
     return event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text and event.from_user
 
 
-def is_games(event):
+def is_game1_start(event):
     command = event.text.lower()
-    if command in comands.__game1__:
+    if command in commands.__game1__:
         user_id = event.user_id
         if user_id in list_of_people_to_game1:
             write_message(user_id, 'вы уже играете')
@@ -43,11 +43,57 @@ def is_games(event):
     return False
 
 
+def is_answer_correct(event, user_answer):
+    quote = game1.get_current_question_for_user(event.user_id)
+    if quote == "error1":
+        return False
+    return user_answer == game1.get_answer_for_question(quote)
+
+
+def stop_game1(event):
+    game1.clear_list_of_questions_for_user(event.user_id)
+    if event.user_id in list_of_people_to_game1:
+        list_of_people_to_game1.remove(event.user_id)
+
+
+def is_game1_stop(event, command):
+    if command in commands.__stop__:
+        stop_game1(event)
+        return True
+    return False
+
+
+def is_in_game_now(event):
+    return event.user_id in list_of_people_to_game1
+
+
+def is_game1(event):
+    command = event.text.lower()
+    if is_game1_start(event):
+        return True
+    if not is_in_game_now(event):
+        return False
+    if is_game1_stop(event, command):
+        return True
+    if is_answer_correct(event, command):
+        write_message(event.user_id, "Вы ответили верно!")
+        quote = game1.get_quote(event.user_id)
+        if quote == "Молодец! Ты ответил верно на все вопросы!":
+            write_message(event.user_id, quote)
+            stop_game1(event)
+            return True
+        write_message(event.user_id, quote)
+        return True
+    stop_game1(event)
+    write_message(event.user_id, "Увы, вы ошиблись(((   Попробуйте ещё разочек)))")
+    return True
+
+
 def main():
     for event in longpoll.listen():
         if not is_correct_event(event):
             continue
-        if is_games(event):
+        if is_game1(event):
             continue
         write_message(event.user_id, 'я вас не понимаю :-(')
 
