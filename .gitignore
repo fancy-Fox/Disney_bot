@@ -2,3 +2,6 @@ __pycache__
 secret_constants.py
 images
 bot_key.pem
+table_creator.py
+disney_bot.db
+sqlite3.*
