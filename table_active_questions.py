@@ -52,4 +52,17 @@ def add_new_question(user_id, question_id):
     conn.commit()
 
 
-add_new_question(30806644, 1)
+def get_count_of_solved_questions(user_id):
+    conn = sqlite3.connect("disney_bot.db")
+    cursor = conn.cursor()
+    res = 0
+    try:
+        res = cursor.execute("""SELECT COUNT(*)
+        FROM active_questions
+        WHERE user_id = ?""", (user_id,)).fetchall()[0][0] - 1
+    except Exception:
+        res = 0
+    return max(res, 0)
+
+
+# add_new_question(30806644, 1)

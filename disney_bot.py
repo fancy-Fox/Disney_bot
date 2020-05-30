@@ -9,10 +9,10 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 
 
 import commands
-import game1
 import secret_constants
 import table_active_questions
 import table_answers
+import table_records
 import table_user
 import table_questions
 
@@ -94,39 +94,50 @@ def is_game1_start(event):
         if 'error' in getting_question:
             write_message(event.user_id, 'Что-то пошло не так, не удалось получить вопрос! Приносим свои извинения :-(')
             return True
-        table_active_questions.add_new_question(user_id, getting_question[0])
+        table_active_questions.add_new_question(user_id, int(getting_question[0]))
         question = table_questions.get_question(getting_question[0])
         print_question(event.user_id, question[0])
         return True
     return False
 
 
-def is_game1(event):
+def is_game1(event):    # TODO объединить с функцией выше
     command = event.text.lower()
     if is_game1_start(event):
+        return True
+    if command in commands.__game1_record__:
+        points = str(table_records.get_record_with_user_id(event.user_id))
+        write_message(event.user_id, 'Ваш рекорд в игре: ' + points)
         return True
     if table_active_questions.is_user_in_game(event.user_id):
         if command in commands.__game1_pause__:     # TODO написать евристику для паузы
             return True
         if not game1_try_to_answer(event.user_id, command):
+            points = str(table_active_questions.get_count_of_solved_questions(event.user_id))
             table_active_questions.remove_all_question_for_user(event.user_id)
-            # TODO сделать рекорды
-            write_message(event.user_id, 'Вы дали неверный ответ. Попробуйте снова!')
+            table_records.insert_new_record(event.user_id, points)
+            write_message(event.user_id, 'Вы дали неверный ответ. Ваш счет: ' + points + '.\n Попробуйте снова!')
             return True
         getting_question = table_questions.get_some_question(event.user_id)
         if 'victory' in getting_question:
             write_message(event.user_id, 'Вы победили! Поздравляю!')
-            # TODO добавить новый рекорд
+            points = str(table_active_questions.get_count_of_solved_questions(event.user_id))
+            table_records.insert_new_record(event.user_id, points)
             table_active_questions.remove_all_question_for_user(event.user_id)
             return True
         if 'error' in getting_question:
             write_message(event.user_id, 'Что-то пошло не так, не удалось получить вопрос! Приносим свои извинения :-(')
             return True
-        table_active_questions.add_new_question(event.user_id, getting_question)
+        table_active_questions.add_new_question(event.user_id, getting_question[0])
+        question = table_questions.get_question(getting_question[0])
+        print_question(event.user_id, question[0])
+        return True
+    return False
 
 
 def exit_command(event):
-    if event.text.lower() == "вырубай" and str(event.user_id) == "262942796":
+    if event.text.lower() == "вырубай" and (str(event.user_id) == "262942796" or str(event.user_id) == '308881991'
+                                            or str(event.user_id) == '30806644'):
         write_message(event.user_id, "пока)")
         exit()
 
@@ -137,10 +148,31 @@ def is_from_admin(event):
 
 def is_sync_command(event):
     if event.text.lower() in commands.__registration__:
-        if table_user.insert_new_user(('unknown name', event.user_id, )):
+        if table_user.insert_new_user(('unknown nick', event.user_id, )):
             write_message(event.user_id, 'Регистрация прошла успешно!')
         else:
             write_message(event.user_id, 'Вы уже зарегистрированы!')
+        return True
+    return False
+
+
+def is_table_users_command(event):
+    if is_sync_command(event):
+        return True
+    if is_rename_command(event):
+        return True
+    return False
+
+
+def is_rename_command(event):
+    split_command = event.text.split()
+    if split_command[0] in commands.__rename__:
+        for i in range(2, len(split_command) - 1):
+            split_command[1] += split_command[i]
+        if table_user.change_nick(event.user_id, split_command[1]):
+            write_message(event.user_id, 'Смена имени произошло успешно!')
+        else:
+            write_message(event.user_id, 'Произошла ошибка при смене имени.')
         return True
     return False
 
@@ -150,7 +182,7 @@ def main():
         if not is_correct_event(event):
             continue
         exit_command(event)
-        if is_sync_command(event):
+        if is_table_users_command(event):
             continue
         if is_from_admin(event):
             continue
