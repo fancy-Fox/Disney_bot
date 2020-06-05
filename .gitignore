@@ -4,4 +4,5 @@ images
 bot_key.pem
 table_creator.py
 disney_bot.db
+disney_bot_test.db
 sqlite3.*

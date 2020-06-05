@@ -1,8 +1,8 @@
 import sqlite3
 
 
-def insert_new_user(user):
-    conn = sqlite3.connect("disney_bot.db")
+def insert_new_user(user, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     vk_ids = cursor.execute("""SELECT vk_id FROM users""").fetchall()
     if len(vk_ids) > 0:
@@ -14,8 +14,8 @@ def insert_new_user(user):
     return 1
 
 
-def change_nick(vk_id, new_nick):
-    conn = sqlite3.connect("disney_bot.db")
+def change_nick(vk_id, new_nick, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     users = cursor.execute("""SELECT * FROM users""").fetchall()
     for user in users:
