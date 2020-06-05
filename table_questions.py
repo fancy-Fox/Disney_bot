@@ -28,7 +28,7 @@ def get_some_question(user_id):
                 WHERE user_id = ?""", (user_id,)).fetchall()
     list_of_used_questions = []
     for question in used_questions:
-        list_of_used_questions.append(question[0])
+        list_of_used_questions.append(question[0])  # TODO без переписывания
     if len(list_of_used_questions) == count_of_questions:
         return {"victory"}
     question_ids = cursor.execute("""
@@ -36,7 +36,7 @@ def get_some_question(user_id):
                     FROM game1_questions""").fetchall()
     for question_id in question_ids:
         if question_id[0] not in list_of_used_questions:
-            table_active_questions
+            table_active_questions  # TODO доделать функцию
             return question_id
     return {'error'}
 

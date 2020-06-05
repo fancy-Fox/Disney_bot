@@ -12,6 +12,7 @@ import commands
 import secret_constants
 import table_active_questions
 import table_answers
+import table_daily_quests
 import table_records
 import table_user
 import table_questions
@@ -115,8 +116,11 @@ def is_game1(event):    # TODO объединить с функцией выше
         if not game1_try_to_answer(event.user_id, command):
             points = str(table_active_questions.get_count_of_solved_questions(event.user_id))
             table_active_questions.remove_all_question_for_user(event.user_id)
-            table_records.insert_new_record(event.user_id, points)
+            new_record = table_records.insert_new_record(event.user_id, points)
             write_message(event.user_id, 'Вы дали неверный ответ. Ваш счет: ' + points + '.\n Попробуйте снова!')
+            if new_record:
+                write_message(event.user_id, 'Кстати, у вас новый рекорд! Поздравляю! B-)')
+            write_message(event.user_id, 'Хотите узнать верный вариант ответа')
             return True
         getting_question = table_questions.get_some_question(event.user_id)
         if 'victory' in getting_question:
@@ -124,6 +128,7 @@ def is_game1(event):    # TODO объединить с функцией выше
             points = str(table_active_questions.get_count_of_solved_questions(event.user_id))
             table_records.insert_new_record(event.user_id, points)
             table_active_questions.remove_all_question_for_user(event.user_id)
+            
             return True
         if 'error' in getting_question:
             write_message(event.user_id, 'Что-то пошло не так, не удалось получить вопрос! Приносим свои извинения :-(')
