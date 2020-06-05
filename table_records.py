@@ -1,8 +1,8 @@
 import sqlite3
 
 
-def change_record(user_id, new_record):
-    conn = sqlite3.connect("disney_bot.db")
+def change_record(user_id, new_record, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     try:
         cursor.execute("""UPDATE records 
@@ -20,10 +20,10 @@ def change_record(user_id, new_record):
         return 0
 
 
-def insert_new_record(user_id, new_record):
-    conn = sqlite3.connect("disney_bot.db")
+def insert_new_record(user_id, new_record, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    records = get_all_records()
+    records = get_all_records(db_name)
     for record in records:
         if record[1] == user_id:
             if int(record[2]) < int(new_record):
@@ -36,26 +36,18 @@ def insert_new_record(user_id, new_record):
     return 1
 
 
-
-
-def get_all_records():
-    conn = sqlite3.connect("disney_bot.db")
+def get_all_records(db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     records = cursor.execute("""SELECT * FROM records""").fetchall()
     return records
 
 
-def get_record_with_user_id(user_id):
-    conn = sqlite3.connect("disney_bot.db")
+def get_record_with_user_id(user_id, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    record = cursor.execute("""SELECT score FROM records WHERE user_id = ?""", (user_id, )).fetchall()[0][0]
-    return record
-
-
-# insert_new_record(30806644, 3)
-
-
-# conn = sqlite3.connect("disney_bot.db")
-# cursor = conn.cursor()
-# records = cursor.execute("""DELETE FROM records""").fetchall()
-# conn.commit()
+    try:
+        record = cursor.execute("""SELECT score FROM records WHERE user_id = ?""", (user_id, )).fetchall()[0][0]
+        return record
+    except Exception:
+        return -1
