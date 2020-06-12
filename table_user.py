@@ -6,8 +6,8 @@ def insert_new_user(user, db_name='disney_bot.db'):
     cursor = conn.cursor()
     vk_ids = cursor.execute("""SELECT vk_id FROM users""").fetchall()
     if len(vk_ids) > 0:
-        for vk_id in vk_ids[0]:
-            if vk_id == user[1]:
+        for vk_id in vk_ids:
+            if vk_id[0] == user[1]:
                 return 0
     cursor.execute("""INSERT INTO users (nick, vk_id) VALUES (?, ?)""", user)
     conn.commit()

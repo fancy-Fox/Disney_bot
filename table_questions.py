@@ -3,21 +3,21 @@ import sqlite3
 import table_active_questions
 
 
-def get_question(question_id):
-    conn = sqlite3.connect("disney_bot.db")
+def get_question(question_id, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     try:
         question = cursor.execute("""
             SELECT * 
             FROM game1_questions 
             WHERE id = ?""", (question_id,)).fetchall()
-        return question
+        return question[0]
     except Exception:
         return -1
 
 
-def get_some_question(user_id):
-    conn = sqlite3.connect("disney_bot.db")
+def get_some_question(user_id, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     count_of_questions = cursor.execute("""
                 SELECT count(*) 
@@ -41,8 +41,8 @@ def get_some_question(user_id):
     return {'error'}
 
 
-def get_correct_answer(question_id):
-    conn = sqlite3.connect("disney_bot.db")
+def get_correct_answer(question_id, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     try:
         correct_answer = cursor.execute("""
@@ -55,8 +55,8 @@ def get_correct_answer(question_id):
         return -1
 
 
-def get_number_of_answer_with_question_id_and_position(question_id, position):
-    conn = sqlite3.connect("disney_bot.db")
+def get_number_of_answer_with_question_id_and_position(question_id, position, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     try:
         question = cursor.execute("""

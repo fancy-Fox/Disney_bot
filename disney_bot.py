@@ -84,7 +84,7 @@ def is_game1_start(event):
         if table_active_questions.is_user_in_game(event.user_id):
             write_message(event.user_id, 'Вы уже участвуете в игре')
             current_question_id = table_active_questions.get_active_question(event.user_id)[0]
-            question = table_questions.get_question(current_question_id)[0]
+            question = table_questions.get_question(current_question_id)
             print_question(event.user_id, question)
             return True
         getting_question = table_questions.get_some_question(user_id)
@@ -97,7 +97,7 @@ def is_game1_start(event):
             return True
         table_active_questions.add_new_question(user_id, int(getting_question[0]))
         question = table_questions.get_question(getting_question[0])
-        print_question(event.user_id, question[0])
+        print_question(event.user_id, question)
         return True
     return False
 
@@ -135,7 +135,7 @@ def is_game1(event):    # TODO объединить с функцией выше
             return True
         table_active_questions.add_new_question(event.user_id, getting_question[0])
         question = table_questions.get_question(getting_question[0])
-        print_question(event.user_id, question[0])
+        print_question(event.user_id, question)
         return True
     return False
 
