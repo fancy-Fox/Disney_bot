@@ -2,8 +2,8 @@ import sqlite3
 import time
 
 
-def get_all_daily_quest_info():
-    conn = sqlite3.connect("disney_bot.db")
+def get_all_daily_quest_info(db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     try:
         return cursor.execute("""SELECT * FROM daily_quests""").fetchall()[0]
@@ -11,8 +11,8 @@ def get_all_daily_quest_info():
         return []
 
 
-def insert_new_daily_quest(new_quest):
-    conn = sqlite3.connect("disney_bot.db")
+def insert_new_daily_quest(new_quest, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     try:
         cursor.execute("""INSERT INTO daily_quests (type, date, user_id) VALUES (?, ?, ?) """, new_quest)
@@ -22,8 +22,8 @@ def insert_new_daily_quest(new_quest):
         return 0
 
 
-def drop_all_daily_quests_info():
-    conn = sqlite3.connect("disney_bot.db")
+def drop_all_daily_quests_info(db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     try:
         cursor.execute("""DELETE FROM daily_quests""")
@@ -33,8 +33,8 @@ def drop_all_daily_quests_info():
         return 0
 
 
-def try_to_delete_daily_quest(daily_quest):
-    conn = sqlite3.connect("disney_bot.db")
+def try_to_delete_daily_quest(daily_quest, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     try:
         cursor.execute("""DELETE FROM daily_quests WHERE type = ? and user_id = ? """, daily_quest)
@@ -44,8 +44,8 @@ def try_to_delete_daily_quest(daily_quest):
         return 0
 
 
-def try_to_insert_new_daily_quest(new_quest):
-    conn = sqlite3.connect("disney_bot.db")
+def try_to_insert_new_daily_quest(new_quest, db_name='disney_bot.db'):
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     try:
         quest_time = cursor.execute("""SELECT date 
